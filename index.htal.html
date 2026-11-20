@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d7c">
+<title>高齡者跌倒預防｜互動衛教 App</title>
+<style>
+  :root{
+    --ink:#2b3a44;
+    --paper:#faf6ef;
+    --card:#ffffff;
+    --teal:#2f5d7c;
+    --teal-light:#eaf3f8;
+    --coral:#e07856;
+    --coral-light:#fdeee8;
+    --green:#3e8e6b;
+    --green-light:#e9f5ef;
+    --red:#c4544e;
+    --red-light:#fbe9e8;
+    --gold:#f2b134;
+    --line:#e6ded1;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+    font-size:17px;line-height:1.7;
+    padding-bottom:76px; /* bottom nav space */
+  }
+  /* ---------- 頂部列 ---------- */
+  header.topbar{
+    position:sticky;top:0;z-index:50;background:var(--teal);color:#fff;
+    padding:10px 16px;display:flex;align-items:center;gap:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  header.topbar .logo{font-size:24px}
+  header.topbar h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.5px}
+  header.topbar .menu-btn{
+    margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;
+    font-size:15px;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;
+  }
+  /* ---------- 進度 ---------- */
+  .progress-strip{
+    position:sticky;top:54px;z-index:40;background:var(--paper);
+    height:6px;
+  }
+  .progress-strip .bar{
+    height:100%;background:linear-gradient(90deg,var(--teal),var(--coral));
+    width:0;transition:width .35s ease;border-radius:0 4px 4px 0;
+  }
+  /* ---------- 頁面 ---------- */
+  main{max-width:560px;margin:0 auto;padding:18px 16px 30px}
+  section.page{display:none;animation:fade .35s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .badge{
+    display:inline-block;background:var(--coral-light);color:var(--coral);
+    font-size:13px;font-weight:700;padding:3px 12px;border-radius:999px;margin-bottom:8px;letter-spacing:1px;
+  }
+  h2.title{font-size:26px;margin:4px 0 6px;color:var(--teal);line-height:1.35}
+  p.sub{margin:0 0 16px;color:#6b7a84;font-size:15px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;margin:12px 0;box-shadow:0 2px 6px rgba(80,60,30,.05);
+  }
+  .card h3{margin:0 0 8px;font-size:19px;display:flex;align-items:center;gap:8px}
+  .card ul{margin:6px 0 2px;padding-left:22px}
+  .card li{margin:5px 0}
+  .hl{color:var(--coral);font-weight:700}
+  .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;
+    font-size:14px;font-weight:700;margin-right:6px;flex:none;
+  }
+  .steps{list-style:none;padding:0;margin:0}
+  .steps li{display:flex;align-items:flex-start;gap:8px;margin:8px 0}
+  /* ---------- 首頁 ---------- */
+  .hero{
+    background:linear-gradient(135deg,#fff 60%,var(--teal-light));
+    border:1px solid var(--line);border-radius:22px;padding:28px 20px;text-align:center;margin-bottom:16px;
+  }
+  .hero .emoji{font-size:56px;line-height:1}
+  .hero h2{font-size:30px;color:var(--teal);margin:10px 0 6px;letter-spacing:2px}
+  .hero p{color:#6b7a84;margin:0 0 16px;font-size:15px}
+  .btn{
+    display:inline-block;border:none;cursor:pointer;font-family:inherit;font-weight:700;
+    background:var(--teal);color:#fff;font-size:17px;padding:13px 26px;border-radius:999px;
+    box-shadow:0 3px 8px rgba(47,93,124,.3);transition:transform .1s;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn.coral{background:var(--coral);box-shadow:0 3px 8px rgba(224,120,86,.35)}
+  .btn.ghost{background:#fff;color:var(--teal);border:2px solid var(--teal);box-shadow:none}
+  .btn.wide{display:block;width:100%;text-align:center}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  /* ---------- 大綱 ---------- */
+  .toc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .toc button{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:14px 10px;font-family:inherit;font-size:15.5px;font-weight:700;color:var(--ink);
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;
+    box-shadow:0 2px 5px rgba(80,60,30,.06);
+  }
+  .toc button .ic{font-size:26px}
+  .toc button:active{transform:scale(.96)}
+  .toc button.quiz{background:var(--coral-light);border-color:#f3c9ba}
+  .toc button.fb{background:var(--green-light);border-color:#c4e2d3}
+  /* ---------- 統計卡 ---------- */
+  .stat{
+    display:flex;align-items:center;gap:12px;background:var(--teal-light);
+    border:1px dashed #b9d4e4;border-radius:16px;padding:14px 16px;margin:12px 0;
+  }
+  .stat .big{font-size:34px;font-weight:800;color:var(--teal);flex:none;line-height:1}
+  /* ---------- 影片卡 ---------- */
+  a.videocard{
+    display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:10px 0;
+    box-shadow:0 2px 5px rgba(80,60,30,.06);
+  }
+  a.videocard .play{
+    width:44px;height:44px;border-radius:50%;background:var(--red);flex:none;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;
+  }
+  a.videocard .tags{font-size:13px;color:#6b7a84}
+  /* ---------- 原因分類 ---------- */
+  .cause-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .cause{
+    border-radius:16px;padding:14px 16px;border:1px solid var(--line);background:var(--card);
+  }
+  .cause h4{margin:0 0 6px;font-size:18px;display:flex;gap:8px;align-items:center}
+  .cause .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--teal-light);color:var(--teal);border-radius:999px;padding:5px 13px;font-size:14.5px;font-weight:600}
+  /* ---------- 因子表格 ---------- */
+  .factor{border-left:4px solid var(--coral);}
+  .factor .pair{display:grid;grid-template-columns:1fr;gap:6px;margin-top:8px}
+  .pair .bad{background:var(--red-light);border-radius:10px;padding:8px 12px;font-size:15px}
+  .pair .good{background:var(--green-light);border-radius:10px;padding:8px 12px;font-size:15px}
+  .pair .tag{font-size:12px;font-weight:800;letter-spacing:1px;display:block;margin-bottom:2px}
+  .bad .tag{color:var(--red)} .good .tag{color:var(--green)}
+  /* ---------- 運動 ---------- */
+  .exercise{border-top:3px solid var(--gold)}
+  .exercise .meta{font-size:14px;color:#6b7a84;margin-bottom:6px}
+  /* ---------- 測驗 ---------- */
+  .quiz-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .quiz-head .score{font-weight:800;color:var(--teal);font-size:16px}
+  .qcard{border:2px solid var(--line);border-radius:20px;background:#fff;padding:20px 18px;margin:14px 0}
+  .qcard .qno{font-size:13px;font-weight:800;color:#fff;background:var(--teal);display:inline-block;padding:2px 12px;border-radius:999px;margin-bottom:8px;letter-spacing:1px}
+  .qcard .qtext{font-size:19px;font-weight:700;margin-bottom:14px;line-height:1.5}
+  .opt{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    background:var(--paper);border:2px solid var(--line);border-radius:14px;
+    padding:13px 14px;font-family:inherit;font-size:16.5px;color:var(--ink);
+    margin:9px 0;cursor:pointer;transition:all .15s;
+  }
+  .opt .k{
+    width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;font-size:15px;
+  }
+  .opt:not(:disabled):hover{border-color:var(--teal)}
+  .opt:disabled{cursor:default}
+  .opt.correct{background:var(--green-light);border-color:var(--green)}
+  .opt.correct .k{background:var(--green);border-color:var(--green);color:#fff}
+  .opt.wrong{background:var(--red-light);border-color:var(--red)}
+  .opt.wrong .k{background:var(--red);border-color:var(--red);color:#fff}
+  .fbmsg{border-radius:12px;padding:11px 14px;font-size:15.5px;margin-top:8px;display:none}
+  .fbmsg.show{display:block;animation:fade .25s ease}
+  .fbmsg.ok{background:var(--green-light);color:var(--green);font-weight:700}
+  .fbmsg.no{background:var(--red-light);color:var(--red);font-weight:700}
+  .qnav{display:flex;gap:10px;margin-top:14px}
+  .qnav .btn{flex:1}
+  .result-box{text-align:center;padding:30px 18px}
+  .result-box .scorebig{font-size:64px;font-weight:800;color:var(--teal);line-height:1.2}
+  .result-box .msg{font-size:18px;margin:10px 0 20px}
+  .stars{font-size:38px;letter-spacing:4px}
+  /* ---------- 回饋 ---------- */
+  .rate-row{display:flex;justify-content:center;gap:6px;margin:10px 0 4px}
+  .rate-row button{
+    background:none;border:none;font-size:36px;cursor:pointer;padding:4px;filter:grayscale(1);opacity:.4;transition:all .15s;font-family:inherit;
+  }
+  .rate-row button.on{filter:none;opacity:1;transform:scale(1.12)}
+  .check-group label{
+    display:flex;align-items:center;gap:10px;background:var(--paper);
+    border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin:8px 0;cursor:pointer;font-size:16px;
+  }
+  .check-group input{width:20px;height:20px;accent-color:var(--green)}
+  textarea, input[type=text]{
+    width:100%;font-family:inherit;font-size:16px;color:var(--ink);
+    border:2px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;
+  }
+  textarea{min-height:110px;resize:vertical}
+  textarea:focus,input:focus{outline:none;border-color:var(--teal)}
+  .fb-done{
+    text-align:center;background:var(--green-light);border:1px solid #bfe0cf;
+    border-radius:16px;padding:24px 18px;display:none;
+  }
+  .fb-done .ic{font-size:48px}
+  .mini-note{font-size:13.5px;color:#8a949b;margin-top:10px;text-align:center}
+  /* ---------- 底部導覽 ---------- */
+  nav.bottom{
+    position:fixed;bottom:0;left:0;right:0;z-index:60;background:#fff;
+    border-top:1px solid var(--line);display:flex;justify-content:space-around;
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    box-shadow:0 -2px 10px rgba(0,0,0,.06);
+  }
+  nav.bottom button{
+    background:none;border:none;font-family:inherit;color:#7a868e;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;
+    padding:4px 12px;border-radius:12px;
+  }
+  nav.bottom button .ic{font-size:22px;line-height:1}
+  nav.bottom button.on{color:var(--teal)}
+  /* ---------- 選單彈窗 ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(30,40,46,.5);z-index:80;display:none;
+    align-items:flex-end;justify-content:center;
+  }
+  .overlay.open{display:flex}
+  .sheet{
+    background:#fff;width:100%;max-width:560px;border-radius:22px 22px 0 0;
+    padding:20px 20px calc(26px + env(safe-area-inset-bottom));max-height:75vh;overflow:auto;
+  }
+  .sheet h3{margin:0 0 12px;font-size:20px;text-align:center}
+  .sheet .toc{grid-template-columns:repeat(3,1fr)}
+  .sheet .toc button{font-size:14px;padding:12px 6px}
+  .close-x{position:absolute;right:14px;top:10px;background:none;border:none;font-size:26px;cursor:pointer;color:#999}
+  .sheet{position:relative}
+  /* ---------- 返回頁首 ---------- */
+  .page-nav{display:flex;gap:10px;margin-top:22px}
+  .page-nav .btn{flex:1;padding:12px}
+  @media(min-width:600px){
+    body{font-size:18px}
+    .toc{grid-template-columns:1fr 1fr}
+    main{padding-top:26px}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="logo">🛡️</span>
+  <h1>高齡者跌倒預防</h1>
+  <button class="menu-btn" onclick="openMenu()">☰ 目錄</button>
+</header>
+<div class="progress-strip"><div class="bar" id="progBar"></div></div>
+
+<main>
+<!-- ================= 0 首頁 ================= -->
+<section class="page active" id="p-home">
+  <div class="hero">
+    <div class="emoji">👵🛡️👴</div>
+    <h2>高齡者跌倒預防</h2>
+    <p>輔英科技大學・教學原理與方法<br>指導老師：莊麗玉老師<br>11520371 張簡又慈｜11520331 曾愷娣</p>
+    <button class="btn coral" onclick="go('toc')">開始學習 ➜</button>
+  </div>
+  <div class="stat">
+    <span class="big">1/6</span>
+    <div>根據國民健康署調查，65 歲以上長者中，<b>約每 6 人就有 1 人</b>在過去一年內曾跌倒！</div>
+  </div>
+  <div class="toc">
+    <button class="quiz" onclick="go('quiz')"><span class="ic">📝</span>挑戰問答題</button>
+    <button class="fb" onclick="go('feedback')"><span class="ic">💬</span>填寫學習回饋</button>
+  </div>
+</section>
+
+<!-- ================= 1 目錄 ================= -->
+<section class="page" id="p-toc">
+  <span class="badge">目錄</span>
+  <h2 class="title">今天要學什麼？</h2>
+  <p class="sub">點一下就能跳到該單元</p>
+  <div class="toc">
+    <button onclick="go('intro')"><span class="ic">📖</span>前言</button>
+    <button onclick="go('video')"><span class="ic">🎬</span>影片欣賞</button>
+    <button onclick="go('cause')"><span class="ic">🤔</span>為什麼容易跌倒</button>
+    <button onclick="go('impact')"><span class="ic">💥</span>跌倒的影響</button>
+    <button onclick="go('factor')"><span class="ic">🔍</span>危險因子與改善</button>
+    <button onclick="go('self')"><span class="ic">💪</span>自身預防</button>
+    <button onclick="go('exercise')"><span class="ic">🦵</span>防跌運動</button>
+    <button onclick="go('whatodo')"><span class="ic">🆘</span>跌倒怎麼辦</button>
+    <button onclick="go('conclusion')"><span class="ic">📌</span>結論</button>
+    <button class="quiz" onclick="go('quiz')"><span class="ic">📝</span>問答挑戰</button>
+    <button class="fb" onclick="go('feedback')"><span class="ic">💬</span>學習回饋</button>
+  </div>
+</section>
+
+<!-- ================= 2 前言 ================= -->
+<section class="page" id="p-intro">
+  <span class="badge">單元 1</span>
+  <h2 class="title">📖 前言</h2>
+  <p class="sub">為什麼我們要關心「跌倒」這件事？</p>
+  <div class="stat">
+    <span class="big">15.5%</span>
+    <div>衛生福利部國民健康署調查：65 歲以上高齡者中，約<b>每 6 人就有 1 人（占 15.5%）</b>在過去一年內曾發生跌倒。</div>
+  </div>
+  <div class="card">
+    <h3>⚠️ 年紀越大，風險越高</h3>
+    <p>隨著年齡增加，高齡者的<span class="hl">肌力、平衡感與視力</span>可能逐漸下降，加上居家環境、疾病或藥物等因素，都可能提高跌倒的風險。</p>
+  </div>
+  <div class="card">
+    <h3>🦴 跌倒不是小事</h3>
+    <p>跌倒不僅可能造成<span class="hl">骨折、頭部受傷</span>，也可能影響日常生活與活動能力。</p>
+  </div>
+  <div class="card">
+    <h3>🎯 這次衛教的目標</h3>
+    <ul>
+      <li>了解高齡者常見的<b>跌倒原因</b></li>
+      <li>學會<b>預防方式</b></li>
+      <li>掌握跌倒後的<b>正確處理方法</b></li>
+    </ul>
+    <p>讓高齡者能在生活中更安全，也降低跌倒所造成的傷害。</p>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('video')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 3 影片 ================= -->
+<section class="page" id="p-video">
+  <span class="badge">單元 2</span>
+  <h2 class="title">🎬 影片欣賞</h2>
+  <p class="sub">點選影片，一起認識跌倒預防（連結至 YouTube 搜尋）</p>
+  <a class="videocard" href="https://www.youtube.com/results?search_query=老人跌倒+跌倒預防" target="_blank" rel="noopener">
+    <span class="play">▶</span>
+    <div><b>主題一：老人跌倒</b><div class="tags">認識跌倒與其嚴重性</div></div>
+  </a>
+  <a class="videocard" href="https://www.youtube.com/results?search_query=跌倒預防+長者+衛教" target="_blank" rel="noopener">
+    <span class="play">▶</span>
+    <div><b>主題二：跌倒預防</b><div class="tags">日常防跌技巧</div></div>
+  </a>
+  <a class="videocard" href="https://www.youtube.com/results?search_query=跌倒應對+長者" target="_blank" rel="noopener">
+    <span class="play">▶</span>
+    <div><b>主題三：跌倒應對</b><div class="tags">跌倒後的正確處理</div></div>
+  </a>
+  <a class="videocard" href="https://www.youtube.com/results?search_query=長者+下肢肌力增強+運動" target="_blank" rel="noopener">
+    <span class="play">▶</span>
+    <div><b>主題四：下肢肌力增強</b><div class="tags">簡單防跌運動教學</div></div>
+  </a>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('cause')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 4 原因 ================= -->
+<section class="page" id="p-cause">
+  <span class="badge">單元 3</span>
+  <h2 class="title">🤔 為什麼容易跌倒？</h2>
+  <p class="sub">四大類原因，看看你中了幾個</p>
+  <div class="cause-grid">
+    <div class="cause">
+      <h4>🧍 身體因素</h4>
+      <div class="chips"><span class="chip">肌力下降</span><span class="chip">平衡感變差</span><span class="chip">視力退化</span></div>
+    </div>
+    <div class="cause">
+      <h4>💊 疾病／藥物因素</h4>
+      <div class="chips"><span class="chip">慢性疾病</span><span class="chip">服用多種藥物</span></div>
+    </div>
+    <div class="cause">
+      <h4>🏠 環境因素</h4>
+      <div class="chips"><span class="chip">地面濕滑</span><span class="chip">雜物阻礙</span><span class="chip">光線不足</span></div>
+    </div>
+    <div class="cause">
+      <h4>👟 行為因素</h4>
+      <div class="chips"><span class="chip">不合適鞋子</span><span class="chip">走路太快</span></div>
+    </div>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('impact')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 5 影響 ================= -->
+<section class="page" id="p-impact">
+  <span class="badge">單元 4</span>
+  <h2 class="title">💥 跌倒的影響</h2>
+  <p class="sub">一次跌倒，影響的不只是身體</p>
+  <div class="card">
+    <h3>🦴 身體傷害</h3>
+    <p>骨折、瘀傷、扭傷、頭部受傷等</p>
+  </div>
+  <div class="card">
+    <h3>😰 心理方面</h3>
+    <p>害怕再次跌倒、缺乏安全感、減少外出或活動</p>
+  </div>
+  <div class="card">
+    <h3>🚶 活動力下降</h3>
+    <p>行動不便、肌力與活動量下降、日常生活受到影響</p>
+  </div>
+  <div class="card">
+    <h3>🏡 生活品質下降</h3>
+    <p>需要家人或他人協助、可能增加照護需求、影響生活自主性</p>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('factor')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 6 危險因子 ================= -->
+<section class="page" id="p-factor">
+  <span class="badge">單元 5</span>
+  <h2 class="title">🔍 找出危險因子・改善環境</h2>
+  <p class="sub">左看問題、右看對策</p>
+  <div class="card factor">
+    <h3>🚿 浴室與地板</h3>
+    <div class="pair">
+      <div class="bad"><span class="tag">✗ 危險</span>地板濕滑、雜物堆積</div>
+      <div class="good"><span class="tag">✓ 改善</span>地面保持乾燥、保持走道通暢</div>
+    </div>
+  </div>
+  <div class="card factor">
+    <h3>💡 照明與扶手</h3>
+    <div class="pair">
+      <div class="bad"><span class="tag">✗ 危險</span>燈光照明不足、浴室無扶手</div>
+      <div class="good"><span class="tag">✓ 改善</span>夜間設置照明、安裝扶手</div>
+    </div>
+  </div>
+  <div class="card factor">
+    <h3>🪜 物品放置</h3>
+    <div class="pair">
+      <div class="bad"><span class="tag">✗ 危險</span>浴室無扶手、物品放置過高</div>
+      <div class="good"><span class="tag">✓ 改善</span>安裝扶手、將物品放置伸手可及處</div>
+    </div>
+    <div class="pair">
+      <div class="good"><span class="tag">✓ 自我預防</span>主動開燈再行走、需要時使用輔具、請求他人協助、避免踮腳或站椅子拿取物品</div>
+    </div>
+  </div>
+  <div class="card factor">
+    <h3>👟 鞋子</h3>
+    <div class="pair">
+      <div class="bad"><span class="tag">✗ 危險</span>鞋底磨損、鞋子不合腳</div>
+      <div class="good"><span class="tag">✓ 改善</span>定期檢查鞋底磨損情況、選擇防滑及合腳的鞋子</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🚶 行走安全</h3>
+    <p>起身、行走時<span class="hl">放慢速度</span>，提供平整、安全的行走空間。</p>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('self')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 7 自身預防 ================= -->
+<section class="page" id="p-self">
+  <span class="badge">單元 6</span>
+  <h2 class="title">💪 高齡者自身預防</h2>
+  <p class="sub">每天做到，跌倒遠離我</p>
+  <div class="card">
+    <ul class="steps">
+      <li><span class="num">1</span><span>穿著<b>和腳、防滑</b>的鞋子</span></li>
+      <li><span class="num">2</span><span>視力不好要<b>定期檢查</b></span></li>
+      <li><span class="num">3</span><span><b>適度運動</b>，維持肌力</span></li>
+      <li><span class="num">4</span><span>行走時<b>不要急</b>，放慢速度</span></li>
+      <li><span class="num">5</span><span>起床或下床時<b>先坐起來再站立</b></span></li>
+      <li><span class="num">6</span><span><b>依醫囑正確服藥</b></span></li>
+    </ul>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('exercise')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 8 防跌運動 ================= -->
+<section class="page" id="p-exercise">
+  <span class="badge">單元 7</span>
+  <h2 class="title">🦵 簡單預防跌倒運動</h2>
+  <p class="sub">每天練習，增強下肢肌力與平衡</p>
+
+  <div class="card exercise">
+    <h3>1️⃣ 後抬腿運動</h3>
+    <p class="meta">重複 10～15 次</p>
+    <ul class="steps">
+      <li><span class="num">1</span><span>準備砂袋、有靠背的椅子</span></li>
+      <li><span class="num">2</span><span>將砂袋固定在腳踝上</span></li>
+      <li><span class="num">3</span><span>站在椅背後方，手握椅背以保持平衡</span></li>
+      <li><span class="num">4</span><span>緩慢吐氣，慢慢向後抬起一腿</span></li>
+      <li><span class="num">5</span><span>停留 1 秒鐘，吸氣，慢慢將腿放下</span></li>
+      <li><span class="num">6</span><span>重複 10～15 次</span></li>
+    </ul>
+  </div>
+
+  <div class="card exercise">
+    <h3>2️⃣ 側抬腿運動</h3>
+    <p class="meta">重複 10～15 次</p>
+    <ul class="steps">
+      <li><span class="num">1</span><span>準備砂袋、有靠背的椅子</span></li>
+      <li><span class="num">2</span><span>將砂袋固定在腳踝上</span></li>
+      <li><span class="num">3</span><span>站在椅背後方，手握椅背以保持平衡</span></li>
+      <li><span class="num">4</span><span>緩慢吐氣，慢慢向外側抬起一腿</span></li>
+      <li><span class="num">5</span><span>停留 1 秒鐘，吸氣，慢慢將腿放下</span></li>
+      <li><span class="num">6</span><span>重複 10～15 次</span></li>
+    </ul>
+  </div>
+
+  <div class="card exercise">
+    <h3>3️⃣ 膝彎曲運動</h3>
+    <p class="meta">重複 10～15 次</p>
+    <ul class="steps">
+      <li><span class="num">1</span><span>準備砂袋、有靠背的椅子</span></li>
+      <li><span class="num">2</span><span>將砂袋固定在腳踝上</span></li>
+      <li><span class="num">3</span><span>站在椅背後方，手握椅背以保持平衡</span></li>
+      <li><span class="num">4</span><span>吐氣，向後抬起一腿</span></li>
+      <li><span class="num">5</span><span>慢慢將腳跟往臀部抬高，只彎曲膝蓋</span></li>
+      <li><span class="num">6</span><span>停留 1 秒鐘，吸氣，慢慢將腿放下</span></li>
+      <li><span class="num">7</span><span>重複 10～15 次</span></li>
+    </ul>
+  </div>
+
+  <div class="card exercise">
+    <h3>4️⃣ 踮腳運動</h3>
+    <p class="meta">重複 10～15 次</p>
+    <ul class="steps">
+      <li><span class="num">1</span><span>站在一張椅子後方，兩腳與肩同寬，手放在椅背上以保持平衡，慢慢呼吸</span></li>
+      <li><span class="num">2</span><span>吐氣並慢慢踮腳，愈高愈好</span></li>
+      <li><span class="num">3</span><span>維持在高處約 1 秒</span></li>
+      <li><span class="num">4</span><span>吸氣，慢慢將腳回到地面</span></li>
+      <li><span class="num">5</span><span>重複 10～15 次</span></li>
+    </ul>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('whatodo')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 9 跌倒怎麼辦 ================= -->
+<section class="page" id="p-whatodo">
+  <span class="badge">單元 8</span>
+  <h2 class="title">🆘 跌倒怎麼辦？</h2>
+  <p class="sub">冷靜處理，安全第一</p>
+  <div class="card">
+    <ul class="steps">
+      <li><span class="num">1</span><span><b class="hl">不要急著自行站起來</b></span></li>
+      <li><span class="num">2</span><span>先確認有沒有<b>疼痛、出血或受傷</b></span></li>
+      <li><span class="num">3</span><span>若無法自行起身，應<b>尋求協助</b></span></li>
+      <li><span class="num">4</span><span>若有頭部撞擊、劇烈疼痛或疑似骨折，<b class="hl">應盡快就醫</b></span></li>
+    </ul>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('conclusion')">下一頁 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 10 結論 ================= -->
+<section class="page" id="p-conclusion">
+  <span class="badge">單元 9</span>
+  <h2 class="title">📌 結論</h2>
+  <p class="sub">預防跌倒，從日常做起</p>
+  <div class="card">
+    <p>高齡者跌倒雖然常見，但大多數風險都可以透過<b>日常生活中的小改變</b>來降低。</p>
+    <ul>
+      <li>🌱 環境安全、行動小心、穿著適當、維持體能、正確用藥與檢查</li>
+      <li>🧊 跌倒後<b>冷靜處理</b>：先確認傷勢，必要時尋求協助或就醫</li>
+    </ul>
+  </div>
+  <div class="card" style="background:var(--teal-light);border-color:#b9d4e4">
+    <p style="text-align:center;font-size:19px;font-weight:800;color:var(--teal);margin:6px 0">
+      「多一分預防，少一分跌倒；<br>從安全環境與良好習慣開始。」
+    </p>
+  </div>
+  <div class="toc" style="margin-top:14px">
+    <button class="quiz" onclick="go('quiz')"><span class="ic">📝</span>挑戰問答題</button>
+    <button class="fb" onclick="go('feedback')"><span class="ic">💬</span>填寫回饋</button>
+  </div>
+  <div class="page-nav">
+    <button class="btn ghost" onclick="go('toc')">回目錄</button>
+    <button class="btn" onclick="go('quiz')">去測驗 ➜</button>
+  </div>
+</section>
+
+<!-- ================= 11 問答題 ================= -->
+<section class="page" id="p-quiz">
+  <span class="badge">互動測驗</span>
+  <h2 class="title">📝 跌倒預防問答挑戰</h2>
+  <div class="quiz-head">
+    <span id="quizProgress" class="badge" style="margin:0">第 1 / 10 題</span>
+    <span class="score" id="quizScore">得分：0</span>
+  </div>
+  <div id="quizArea"></div>
+</section>
+
+<!-- ================= 12 回饋 ================= -->
+<section class="page" id="p-feedback">
+  <span class="badge">學習回饋</span>
+  <h2 class="title">💬 告訴我們你的想法</h2>
+  <p class="sub">你的回饋會保存在此裝置，可提供老師查看與下載</p>
+
+  <div id="fbForm">
+    <div class="card">
+      <h3>⭐ 今天這份衛教內容，你滿意嗎？</h3>
+      <div class="rate-row" id="rateRow">
+        <button data-v="1" aria-label="1 星">😺</button>
+        <button data-v="2" aria-label="2 星">🙂</button>
+        <button data-v="3" aria-label="3 星">😊</button>
+        <button data-v="4" aria-label="4 星">🤩</button>
+        <button data-v="5" aria-label="5 星">❤️</button>
+      </div>
+      <p class="mini-note" id="rateText">點一下表情打分數</p>
+    </div>
+
+    <div class="card">
+      <h3>🎁 這次你學到了什麼？（可複選）</h3>
+      <div class="check-group">
+        <label><input type="checkbox" value="認識跌倒的原因">認識跌倒的原因</label>
+        <label><input type="checkbox" value="居家環境的改善方法">居家環境的改善方法</label>
+        <label><input type="checkbox" value="防跌運動">防跌運動</label>
+        <label><input type="checkbox" value="跌倒後的正確處理">跌倒後的正確處理</label>
+        <label><input type="checkbox" value="自身預防習慣">自身預防習慣</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📝 你的姓名／單位（選填）</h3>
+      <input type="text" id="fbName" placeholder="例：王奶奶／家屬">
+    </div>
+
+    <div class="card">
+      <h3>💭 想說的話或建議</h3>
+      <textarea id="fbText" placeholder="寫下你的想法、建議或問題…"></textarea>
+    </div>
+
+    <button class="btn coral wide" id="fbSubmit" onclick="submitFeedback()">送出回饋 ✉️</button>
+    <p class="mini-note">測驗成績會自動一併記錄（目前：未測驗）</p>
+  </div>
+
+  <div class="fb-done" id="fbDone">
+    <div class="ic">✅</div>
+    <h3 style="margin:8px 0 4px">回饋已送出，謝謝你！</h3>
+    <p style="margin:0 0 16px;color:#5f7a6d" id="fbDoneMsg"></p>
+    <button class="btn ghost" onclick="resetFeedback()">再填一份</button>
+    <button class="btn" onclick="go('home')" style="margin-left:8px">回首頁</button>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h3>🗂️ 已收集的回饋</h3>
+    <p id="fbCount" style="margin:0 0 10px">目前累積 0 筆回饋</p>
+    <button class="btn ghost" onclick="downloadCSV()">⬇️ 下載回饋紀錄（CSV，給老師）</button>
+    <button class="btn" style="margin-left:8px" onclick="viewFeedback()">👁️ 查看</button>
+    <div id="fbList" style="margin-top:12px;display:none"></div>
+  </div>
+</section>
+
+<!-- ================= 13 謝謝 ================= -->
+<section class="page" id="p-thanks">
+  <div class="hero">
+    <div class="emoji">🙏✨</div>
+    <h2>謝謝聆聽</h2>
+    <p>多一分預防，少一分跌倒</p>
+    <button class="btn coral" onclick="go('home')">回首頁</button>
+  </div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button data-nav="home" class="on" onclick="go('home')"><span class="ic">🏠</span>首頁</button>
+  <button data-nav="toc" onclick="go('toc')"><span class="ic">📋</span>目錄</button>
+  <button data-nav="quiz" onclick="startQuiz()"><span class="ic">📝</span>測驗</button>
+  <button data-nav="feedback" onclick="go('feedback')"><span class="ic">💬</span>回饋</button>
+</nav>
+
+<div class="overlay" id="menuOverlay" onclick="if(event.target===this)closeMenu()">
+  <div class="sheet">
+    <button class="close-x" onclick="closeMenu()">✕</button>
+    <h3>📖 目錄</h3>
+    <div class="toc">
+      <button onclick="go('intro')"><span class="ic">📖</span>前言</button>
+      <button onclick="go('video')"><span class="ic">🎬</span>影片</button>
+      <button onclick="go('cause')"><span class="ic">🤔</span>原因</button>
+      <button onclick="go('impact')"><span class="ic">💥</span>影響</button>
+      <button onclick="go('factor')"><span class="ic">🔍</span>危險因子</button>
+      <button onclick="go('self')"><span class="ic">💪</span>自身預防</button>
+      <button onclick="go('exercise')"><span class="ic">🦵</span>防跌運動</button>
+      <button onclick="go('whatodo')"><span class="ic">🆘</span>跌倒處理</button>
+      <button onclick="go('conclusion')"><span class="ic">📌</span>結論</button>
+      <button class="quiz" onclick="go('quiz')"><span class="ic">📝</span>問答</button>
+      <button class="fb" onclick="go('feedback')"><span class="ic">💬</span>回饋</button>
+      <button onclick="go('home')"><span class="ic">🏠</span>首頁</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========================================================
+   頁面導覽
+======================================================== */
+const PAGE_ORDER = ["home","toc","intro","video","cause","impact","factor","self","exercise","whatodo","conclusion","quiz","feedback","thanks"];
+let currentPage = "home";
+
+function go(name){
+  document.querySelectorAll("section.page").forEach(s => s.classList.remove("active"));
+  const el = document.getElementById("p-" + name);
+  if(!el) return;
+  el.classList.add("active");
+  currentPage = name;
+  closeMenu();
+  window.scrollTo({top:0, behavior:"smooth"});
+  // 底部導覽狀態
+  document.querySelectorAll("nav.bottom button").forEach(b=>{
+    b.classList.toggle("on", b.dataset.nav === name);
+  });
+  // 進度條
+  const idx = PAGE_ORDER.indexOf(name);
+  document.getElementById("progBar").style.width = (idx/(PAGE_ORDER.length-1)*100) + "%";
+}
+function openMenu(){ document.getElementById("menuOverlay").classList.add("open"); }
+function closeMenu(){ document.getElementById("menuOverlay").classList.remove("open"); }
+
+/* ========================================================
+   問答題
+======================================================== */
+const QUESTIONS = [
+  { q:"根據國民健康署調查，65 歲以上高齡者約每幾人就有 1 人在過去一年內跌倒？",
+    opts:["每 3 人","每 6 人","每 10 人","每 20 人"], a:1,
+    ex:"約每 6 人就有 1 人（占 15.5%），跌倒是高齡者常見但可預防的問題。" },
+  { q:"下列何者「不是」造成高齡者跌倒的身體因素？",
+    opts:["肌力下降","平衡感變差","視力退化","走路放慢速度"], a:3,
+    ex:"走路放慢速度是正確的防跌行為；肌力下降、平衡感變差、視力退化才是身體因素。" },
+  { q:"「服用多種藥物」屬於哪一類跌倒危險因子？",
+    opts:["環境因素","疾病／藥物因素","行為因素","運動因素"], a:1,
+    ex:"慢性疾病與服用多種藥物屬於疾病／藥物因素。" },
+  { q:"浴室地板濕滑時，應該怎麼做？",
+    opts:["小心一點快速走過去","保持地面乾燥並使用防滑措施","鋪一塊舊報紙","跌倒再說"], a:1,
+    ex:"保持地面乾燥並使用防滑措施，加上浴室安裝扶手，才能有效防跌。" },
+  { q:"哪一種鞋子比較適合預防跌倒？",
+    opts:["防滑、合腳的鞋子","鞋底磨損的鞋","鞋底太滑的鞋","尺寸偏大的鞋"], a:0,
+    ex:"應選擇防滑及合腳的鞋子，並定期檢查鞋底磨損情況。" },
+  { q:"起床或下床時，正確的做法是？",
+    opts:["直接快速站起來","先坐起來再站立","閉著眼睛站起來","請別人拉自己一把就跳起來"], a:1,
+    ex:"起床或下床時先坐起來再站立，避免姿勢性低血壓造成暈眩跌倒。" },
+  { q:"行走時比較安全的做法是？",
+    opts:["走路放慢速度","走路越快越好","不開燈摸黑走","踩著椅子拿高處物品"], a:0,
+    ex:"起身、行走時放慢速度；夜間應主動開燈再行走，避免踮腳或站椅子拿取物品。" },
+  { q:"防跌運動（後抬腿、側抬腿、膝彎曲、踮腳）建議重複多少次？",
+    opts:["2～3 次","10～15 次","50 次","不用做"], a:1,
+    ex:"每個動作重複 10～15 次，適度運動可以維持肌力與平衡。" },
+  { q:"跌倒後的第一件事應該做什麼？",
+    opts:["馬上爬起來","先確認有沒有疼痛、出血或受傷","大聲哭泣","先走回家再說"], a:1,
+    ex:"不要急著自行站起來，先確認有沒有疼痛、出血或受傷。" },
+  { q:"跌倒後若無法自行起身，或頭部撞擊、疑似骨折時應該？",
+    opts:["躺一躺就好","尋求協助並盡快就醫","自己按摩","隔天再看"], a:1,
+    ex:"若無法自行起身應尋求協助；有頭部撞擊、劇烈疼痛或疑似骨折，應盡快就醫。" },
+];
+
+let quizIdx = 0, quizScore = 0, quizDone = false, lastScore = null;
+let quizAnswered = false;
+
+function startQuiz(){
+  go("quiz");
+  if(quizDone){
+    // 已做完，顯示結果；提供重測
+    showQuizResult(true);
+  } else if(quizIdx === 0){
+    renderQuestion();
+  }
+}
+
+function renderQuestion(){
+  quizAnswered = false;
+  const q = QUESTIONS[quizIdx];
+  document.getElementById("quizProgress").textContent = `第 ${quizIdx+1} / ${QUESTIONS.length} 題`;
+  document.getElementById("quizScore").textContent = `得分：${quizScore}`;
+  const area = document.getElementById("quizArea");
+  const letters = ["A","B","C","D"];
+  area.innerHTML = `
+    <div class="qcard">
+      <span class="qno">QUESTION ${quizIdx+1}</span>
+      <div class="qtext">${q.q}</div>
+      ${q.opts.map((o,i)=>`
+        <button class="opt" data-i="${i}" onclick="answer(${i},this)">
+          <span class="k">${letters[i]}</span><span>${o}</span>
+        </button>`).join("")}
+      <div class="fbmsg" id="fbMsg"></div>
+      <div class="qnav">
+        <button class="btn" id="nextBtn" style="display:none" onclick="nextQuestion()">下一題 ➜</button>
+      </div>
+    </div>
+    <p class="mini-note">答對得 10 分，答錯也別擔心，會告訴你正確觀念！</p>`;
+}
+
+function answer(i, btn){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const q = QUESTIONS[quizIdx];
+  const correct = i === q.a;
+  if(correct) quizScore += 10;
+  document.getElementById("quizScore").textContent = `得分：${quizScore}`;
+  // 上色
+  document.querySelectorAll("#quizArea .opt").forEach(o=>{
+    const oi = +o.dataset.i;
+    o.disabled = true;
+    if(oi === q.a) o.classList.add("correct");
+    else if(oi === i && !correct) o.classList.add("wrong");
+  });
+  const msg = document.getElementById("fbMsg");
+  msg.className = "fbmsg show " + (correct ? "ok" : "no");
+  msg.textContent = (correct ? "🎉 答對了！ " : "💡 再想想～正確答案：") + q.ex;
+  const nb = document.getElementById("nextBtn");
+  nb.style.display = "block";
+  nb.textContent = quizIdx === QUESTIONS.length-1 ? "看結果 🏁" : "下一題 ➜";
+  nb.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+function nextQuestion(){
+  if(quizIdx < QUESTIONS.length-1){
+    quizIdx++;
+    renderQuestion();
+    window.scrollTo({top:0, behavior:"smooth"});
+  } else {
+    quizDone = true;
+    lastScore = quizScore;
+    saveQuizScore();
+    showQuizResult(false);
+  }
+}
+
+function showQuizResult(isReplay){
+  const max = QUESTIONS.length*10;
+  const stars = lastScore >= 90 ? 3 : lastScore >= 60 ? 2 : 1;
+  const msg = lastScore === max ? "太棒了！你已經是防跌小達人 🏅"
+            : lastScore >= 60 ? "很棒！再複習一下就能全對 💪"
+            : "別氣餒，回到各單元再看一次，一定會進步 🌱";
+  document.getElementById("quizProgress").textContent = "測驗完成";
+  document.getElementById("quizScore").textContent = `得分：${lastScore}`;
+  document.getElementById("quizArea").innerHTML = `
+    <div class="qcard result-box">
+      <div class="stars">${"⭐".repeat(stars)}${"☆".repeat(3-stars)}</div>
+      <div class="scorebig">${lastScore}<span style="font-size:24px;color:#8a949b"> / ${max}</span></div>
+      <div class="msg">${msg}</div>
+      <button class="btn coral" onclick="retryQuiz()">🔁 再測一次</button>
+      <button class="btn ghost" style="margin-left:8px" onclick="go('feedback')">去填回饋 💬</button>
+    </div>`;
+  if(isReplay) window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function retryQuiz(){
+  quizIdx = 0; quizScore = 0; quizDone = false;
+  renderQuestion();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ========================================================
+   回饋表單
+======================================================== */
+let fbRating = 0;
+document.getElementById("rateRow").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  fbRating = +b.dataset.v;
+  document.querySelectorAll("#rateRow button").forEach(x=>{
+    x.classList.toggle("on", +x.dataset.v <= fbRating);
+  });
+  const labels = ["","再加油…","還可以","不錯喔！","很喜歡！","超級棒！❤️"];
+  document.getElementById("rateText").textContent = `${fbRating} 分：${labels[fbRating]}`;
+});
+
+function submitFeedback(){
+  if(!fbRating){ alert("請先點選表情打分數喔！"); return; }
+  const items = [...document.querySelectorAll(".check-group input:checked")].map(i=>i.value);
+  const name = document.getElementById("fbName").value.trim();
+  const text = document.getElementById("fbText").value.trim();
+  const rec = {
+    時間: new Date().toLocaleString("zh-TW", {hour12:false}),
+    姓名: name || "（未填）",
+    滿意度: fbRating,
+    學到: items.join("、") || "（未勾選）",
+    意見: text || "（無）",
+    測驗成績: lastScore === null ? "未測驗" : `${lastScore}/${QUESTIONS.length*10}`
+  };
+  const all = JSON.parse(localStorage.getItem("fallPreventionFeedback") || "[]");
+  all.push(rec);
+  localStorage.setItem("fallPreventionFeedback", JSON.stringify(all));
+  document.getElementById("fbForm").style.display = "none";
+  document.getElementById("fbDone").style.display = "block";
+  document.getElementById("fbDoneMsg").textContent =
+    `滿意度 ${fbRating} 分｜學到 ${items.length} 項｜已累積 ${all.length} 筆回饋`;
+  updateFbCount();
+}
+
+function resetFeedback(){
+  document.getElementById("fbDone").style.display = "none";
+  document.getElementById("fbForm").style.display = "block";
+  fbRating = 0;
+  document.querySelectorAll("#rateRow button").forEach(x=>x.classList.remove("on"));
+  document.getElementById("rateText").textContent = "點一下表情打分數";
+  document.querySelectorAll(".check-group input").forEach(i=>i.checked=false);
+  document.getElementById("fbName").value = "";
+  document.getElementById("fbText").value = "";
+}
+
+function getFeedback(){ return JSON.parse(localStorage.getItem("fallPreventionFeedback") || "[]"); }
+function updateFbCount(){ document.getElementById("fbCount").textContent = `目前累積 ${getFeedback().length} 筆回饋`; }
+
+function viewFeedback(){
+  const box = document.getElementById("fbList");
+  if(box.style.display === "none"){
+    const all = getFeedback();
+    box.innerHTML = all.length === 0
+      ? '<p style="color:#8a949b;font-size:14.5px;margin:0">還沒有回饋紀錄。</p>'
+      : all.map((r,i)=>`
+        <div style="border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0;font-size:14.5px">
+          <b>#${i+1}</b> ${r.姓名}　⭐${r.滿意度}　<small style="color:#8a949b">${r.時間}</small><br>
+          學到：${r.學到}<br>意見：${r.意見}<br>測驗：${r.測驗成績}
+        </div>`).join("");
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+  }
+}
+
+function downloadCSV(){
+  const all = getFeedback();
+  if(all.length === 0){ alert("目前沒有回饋紀錄可以下載。"); return; }
+  const rows = [Object.keys(all[0])].concat(all.map(r=>Object.keys(all[0]).map(k=>r[k])));
+  const csv = "\uFEFF" + rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "高齡者跌倒預防_回饋紀錄.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function saveQuizScore(){
+  try{ localStorage.setItem("fallPreventionQuizScore", String(lastScore)); }catch(e){}
+}
+
+/* 初始 */
+updateFbCount();
+go("home");
+</script>
+</body>
+</html>
